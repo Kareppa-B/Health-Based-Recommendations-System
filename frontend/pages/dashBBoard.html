@@ -1,0 +1,3362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Food Dashboard - Health Recommendations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Set smooth color transitions for everything */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f7fa;
+            color: #2c3e50;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-link:hover {
+            transform: scale(1.03);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* --- NEW THEME TOGGLE BUTTON STYLES --- */
+        .theme-toggle {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: relative;
+            transition: transform 0.3s ease;
+            border-radius: 50%;
+            color: #2c3e50;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.15) rotate(15deg);
+        }
+
+        .theme-icon {
+            position: absolute;
+        }
+
+        .theme-icon.sun {
+            display: none;
+        }
+
+        .theme-icon.moon {
+            display: block;
+        }
+
+        /* --- END NEW THEME STYLES --- */
+
+
+        .welcome-text {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            background: #c0392b;
+        }
+
+        /* --- CART WIDGET STYLES --- */
+        .cart-widget-container {
+            position: relative;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.8rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            width: 40px;
+            height: 40px;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            display: none;
+        }
+
+        .cart-popover {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 340px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-widget-container:hover .cart-popover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .popover-content {
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .popover-empty {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .popover-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .popover-item-qty {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3498db;
+            flex-shrink: 0;
+        }
+
+        .popover-item-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .popover-item-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .popover-item-restaurant {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+        }
+
+        .popover-item-price {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #e74c3c;
+            flex-shrink: 0;
+        }
+
+        .popover-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-top: 1px solid #e1e8ed;
+            background: #f8f9fa;
+        }
+
+        .popover-total {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .popover-total span {
+            color: #e74c3c;
+            margin-left: 0.5rem;
+        }
+
+        .popover-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .popover-btn:hover {
+            transform: scale(1.05);
+            background: #2980b9;
+        }
+
+        /* --- PROFILE POPOVER STYLES --- */
+        .profile-widget-container {
+            position: relative;
+        }
+
+        .profile-popover {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .profile-widget-container:hover .profile-popover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .popover-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .popover-avatar {
+            width: 45px;
+            height: 45px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .popover-user-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .popover-user-info strong {
+            color: #2c3e50;
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .popover-user-info span {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .popover-links {
+            display: flex;
+            flex-direction: column;
+            padding: 0.75rem;
+        }
+
+        .popover-link {
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .popover-link:hover {
+            background: #f8f9fa;
+        }
+
+        .popover-link.logout {
+            color: #e74c3c;
+        }
+
+        .popover-link.logout:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        /* --- END PROFILE STYLES --- */
+
+
+        /* Main Dashboard Container */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            height: fit-content;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+            color: #2c3e50;
+            transform: translateX(5px);
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-item.active:hover {
+            filter: brightness(1.1);
+        }
+
+        .health-status {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .health-status-title {
+            font-weight: 600;
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        .health-condition {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            /* MODIFIED transition */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        /* MODIFIED hover effect */
+        .filter-select:hover {
+            transform: scale(1.03);
+            border-color: #bdc3c7;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3498db;
+            /* ADDED shadow on focus */
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: -0.02em;
+        }
+
+        .health-recommendation-badge {
+            background: #27ae60;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .view-all-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        /* Food Cards Grid */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .food-card.health-recommended {
+            border: 2px solid #27ae60;
+        }
+
+        .food-card.health-recommended::before {
+            content: 'Health Recommended';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .food-card.health-caution {
+            border: 2px solid #f39c12;
+        }
+
+        .food-card.health-caution::before {
+            content: 'Consume with Caution';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f39c12;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .food-card.health-avoid {
+            border: 2px solid #e74c3c;
+            opacity: 0.7;
+        }
+
+        .food-card.health-avoid::before {
+            content: 'Not Recommended';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .food-image {
+            height: 180px;
+            background: linear-gradient(135deg, #f0f2f5, #e6e9ee);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .food-card:hover .food-image::after {
+            left: 100%;
+        }
+
+        .food-info {
+            padding: 1.5rem;
+        }
+
+        .food-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .food-description {
+            color: #5a6872;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .food-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .food-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .rating-avg-label {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            font-weight: 500;
+            margin-left: 2px;
+        }
+
+        .food-price {
+            font-weight: 600;
+            color: #e74c3c;
+        }
+
+        .food-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .food-tag {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* --- NEW UNIVERSAL VEG/NON-VEG SYMBOLS --- */
+        .food-veg-tag,
+        .food-nonveg-tag {
+            position: absolute;
+            /* MOVED TO TOP-LEFT */
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            /* --- */
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            border-radius: 3px;
+            font-size: 0;
+            border-width: 2px;
+            border-style: solid;
+            background: transparent !important;
+            transition: all 0.3s ease;
+        }
+
+        .food-veg-tag::after,
+        .food-nonveg-tag::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* --- NEW TOOLTIP ON HOVER --- */
+        .food-veg-tag::before,
+        .food-nonveg-tag::before {
+            content: '';
+            /* Text set in specific rules */
+            position: absolute;
+            top: 50%;
+            left: calc(100% + 8px);
+            transform: translateY(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 10;
+        }
+
+        .food-veg-tag:hover::before,
+        .food-nonveg-tag:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- END TOOLTIP --- */
+
+
+        /* Green for Veg */
+        .food-veg-tag {
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .food-veg-tag::after {
+            background-color: #27ae60;
+        }
+
+        .food-veg-tag::before {
+            content: 'Vegetarian';
+            /* Tooltip text */
+        }
+
+        /* Red for Non-Veg */
+        .food-nonveg-tag {
+            border-color: #c0392b;
+            color: #c0392b;
+        }
+
+        .food-nonveg-tag::after {
+            background-color: #c0392b;
+        }
+
+        .food-nonveg-tag::before {
+            content: 'Non-Vegetarian';
+            /* Tooltip text */
+        }
+
+        /* --- END NEW SYMBOLS --- */
+
+
+        .health-benefit-tag {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .health-warning-tag {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            background: #2980b9;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e1e8ed;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Health Alert */
+        .health-alert {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .health-alert-icon {
+            font-size: 2rem;
+            color: #3498db;
+        }
+
+        .health-alert-content h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .health-alert-content p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid #e1e8ed;
+            flex-shrink: 0;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.8) translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        /* Health Recommendations Specific Styles */
+        .health-recommendation-reason {
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid #27ae60;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .health-recommendation-reason h5 {
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        .nutritional-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .nutritional-item {
+            text-align: center;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .nutritional-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .nutritional-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        /* Restaurant Selector Button Style */
+        .restaurant-select-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+
+        .restaurant-select-btn:hover {
+            background: rgba(52, 152, 219, 0.1);
+            border-color: #3498db;
+            transform: translateX(5px);
+        }
+
+        .restaurant-select-btn strong {
+            color: #3498db;
+        }
+
+        .restaurant-select-btn div:last-child {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e74c3c;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .restaurant-health-rating {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #27ae60;
+        }
+
+        /* Modal Sort Controls Styles */
+        .modal-sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sort-tag {
+            background: rgba(0, 0, 0, 0.05);
+            color: #7f8c8d;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-tag:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sort-tag.active {
+            background: #3498db;
+            color: white;
+        }
+
+
+        .order-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .order-history-item {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e8ed;
+        }
+
+        .order-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .order-status {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .order-status.delivered {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .order-status.processing {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .order-items-list {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .order-reorder-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .order-reorder-btn:hover {
+            transform: translateY(-2px);
+            background: #2980b9;
+        }
+
+        /* Cart View Styles */
+        .cart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .cart-restaurant-group {
+            border: 1px solid #e1e8ed;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .cart-restaurant-header {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #3498db;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e1e8ed;
+            background: white;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-emoji {
+            font-size: 2.5rem;
+            margin-right: 1rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+        }
+
+        .cart-item-info h4 {
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .cart-item-price {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-qty {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .cart-qty-btn {
+            background: #e1e8ed;
+            border: none;
+            color: #2c3e50;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .cart-total-label {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+
+        .cart-total-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            background: #2ecc71;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification.success {
+            background: #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .notification.info {
+            background: #3498db;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .button-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: button-spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes button-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* --- SETTINGS PAGE STYLES (Restored) --- */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 2rem;
+        }
+
+        .settings-nav {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            height: fit-content;
+        }
+
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .settings-nav-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .settings-nav-item.active {
+            background: #3498db;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .settings-tab-pane {
+            display: none;
+        }
+
+        h3.setting-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group .filter-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group input[type="password"]:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-label input {
+            margin-right: 0.5rem;
+        }
+
+        /* --- START: Button Style Fix --- */
+        .save-btn,
+        .danger-btn {
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .save-btn {
+            background: #27ae60;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            background: #2ecc71;
+        }
+
+        .danger-btn {
+            background: #e74c3c;
+        }
+
+        .danger-btn:hover {
+            transform: translateY(-2px);
+            /* Added transform to match */
+            background: #c0392b;
+        }
+
+        /* --- END: Button Style Fix --- */
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-switch span {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .toggle-switch .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: #27ae60;
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* --- END SETTINGS STYLES --- */
+
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .user-profile {
+                gap: 0.5rem;
+            }
+
+            .welcome-text {
+                display: none;
+            }
+
+            .food-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: #3498db;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            background: #2980b9;
+        }
+    </style>
+
+    <style>
+        html.dark :root {
+            color-scheme: dark;
+        }
+
+        html.dark body {
+            background: #111827;
+            color: #e0e0f0;
+        }
+
+        html.dark .theme-icon.sun {
+            display: block;
+        }
+
+        html.dark .theme-icon.moon {
+            display: none;
+        }
+
+        html.dark .dashboard-header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(15px);
+            box-shadow: none;
+            border-bottom: 1px solid #374151;
+        }
+
+        html.dark .cart-popover,
+        html.dark .profile-popover,
+        html.dark .modal-content {
+            background: rgba(43, 43, 62, 0.85);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a4a5e;
+        }
+
+        html.dark .sidebar,
+        html.dark .main-content {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(10px);
+            box-shadow: none;
+            border: 1px solid #374151;
+        }
+
+        html.dark .food-card,
+        html.dark .stat-card,
+        html.dark .order-history-item,
+        html.dark .cart-restaurant-group,
+        html.dark .cart-summary {
+            background: #1f2937;
+            box-shadow: none;
+            border: 1px solid #374151;
+        }
+
+        html.dark .food-card:hover {
+            box-shadow: none;
+            border-color: #4b5563;
+        }
+
+        html.dark .cart-item {
+            background: #1f2937;
+        }
+
+        html.dark .food-image {
+            background: linear-gradient(135deg, #374151, #1f2937);
+        }
+
+        html.dark .filter-select,
+        html.dark .search-input,
+        html.dark .form-group input[type="text"],
+        html.dark .form-group input[type="email"],
+        html.dark .form-group input[type="password"],
+        html.dark .form-group .filter-select {
+            background: #252536;
+            border-color: #4a4a5e;
+            color: #e0e0f0;
+        }
+
+        /* MODIFIED dark mode hover for filter-select */
+        html.dark .filter-select:hover {
+            transform: scale(1.03);
+            border-color: #6b7280;
+        }
+
+        /* MODIFIED dark mode focus for filter-select */
+        html.dark .filter-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        html.dark .logo,
+        html.dark .welcome-text,
+        html.dark .cart-icon,
+        html.dark .filter-label,
+        html.dark .section-title,
+        html.dark .food-title,
+        html.dark .stat-number,
+        html.dark .popover-total,
+        html.dark .popover-user-info strong,
+        html.dark .popover-link,
+        html.dark .modal-title,
+        html.dark .health-alert-content h4,
+        html.dark .restaurant-select-btn,
+        html.dark h3.setting-section-title,
+        html.dark .form-group label,
+        html.dark .toggle-switch span,
+        html.dark .order-id,
+        html.dark .cart-item-info h4,
+        html.dark .cart-total-value,
+        html.dark .nutritional-value,
+        html.dark .theme-toggle {
+            color: #e0e0f0;
+        }
+
+        html.dark .sidebar-title {
+            color: #9ca3af;
+        }
+
+        html.dark .popover-empty,
+        html.dark .popover-item-restaurant,
+        html.dark .popover-user-info span,
+        html.dark .food-description,
+        html.dark .rating-avg-label,
+        html.dark .stat-label,
+        html.dark .health-alert-content p,
+        html.dark .nutritional-label,
+        html.dark .close-btn,
+        html.dark .sort-tag,
+        html.dark .cart-item-price {
+            color: #a0a0b0;
+        }
+
+        html.dark .close-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+            color: #f08080;
+        }
+
+        html.dark .popover-footer,
+        html.dark .popover-profile-header,
+        html.dark .order-history-header,
+        html.dark .order-details,
+        html.dark .cart-restaurant-header,
+        html.dark .cart-item,
+        html.dark .modal-header {
+            border-color: #374151;
+        }
+
+        html.dark .popover-footer,
+        html.dark .settings-nav,
+        html.dark .nutritional-item,
+        html.dark .checkbox-label,
+        html.dark .cart-restaurant-header,
+        html.dark .cart-item-emoji {
+            background: #2a2a3a;
+        }
+
+        html.dark .popover-link:hover,
+        html.dark .settings-nav-item:hover {
+            background: rgba(52, 152, 219, 0.15);
+        }
+
+        html.dark .sidebar-item {
+            color: #e0e0f0;
+        }
+
+        html.dark .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0f0;
+        }
+
+        html.dark .sidebar-item.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        html.dark .sidebar-item.active:hover {
+            filter: brightness(1.1);
+        }
+
+
+        html.dark .popover-link.logout:hover {
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        html.dark .view-all-btn:hover {
+            background: rgba(52, 152, 219, 0.15);
+        }
+
+        html.dark .cart-qty-btn {
+            background: #4a4a5e;
+            color: #e0e0f0;
+        }
+
+        html.dark .sort-tag:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        html.dark .sort-tag.active {
+            background: #3498db;
+            color: white;
+        }
+
+        html.dark .health-status,
+        html.dark .health-recommendation-reason,
+        html.dark .health-benefit-tag,
+        html.dark .order-status.delivered {
+            background: rgba(46, 204, 113, 0.15);
+        }
+
+        html.dark .health-status-title,
+        html.dark .health-recommendation-reason h5,
+        html.dark .health-benefit-tag,
+        html.dark .restaurant-health-rating,
+        html.dark .order-status.delivered {
+            color: #2ecc71;
+        }
+
+        html.dark .health-condition,
+        html.dark .health-warning-tag {
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        html.dark .health-condition,
+        html.dark .health-warning-tag {
+            color: #e74c3c;
+        }
+
+        /* --- DARK MODE VEG/NON-VEG SYMBOLS --- */
+        html.dark .food-veg-tag,
+        html.dark .food-nonveg-tag {
+            background: transparent !important;
+        }
+
+        /* Brighter green for dark mode */
+        html.dark .food-veg-tag {
+            border-color: #2ecc71;
+            color: #2ecc71;
+        }
+
+        html.dark .food-veg-tag::after {
+            background-color: #2ecc71;
+        }
+
+        /* Brighter red for dark mode */
+        html.dark .food-nonveg-tag {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        html.dark .food-nonveg-tag::after {
+            background-color: #e74c3c;
+        }
+
+        /* Dark mode tooltip style */
+        html.dark .food-veg-tag::before,
+        html.dark .food-nonveg-tag::before {
+            background: #f4f7fa;
+            color: #2c3e50;
+        }
+
+        /* --- END DARK MODE SYMBOLS --- */
+
+
+        html.dark .health-alert,
+        html.dark .food-tag {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+
+        html.dark .order-status.processing {
+            background: rgba(243, 156, 18, 0.15);
+            color: #f39c12;
+        }
+
+        html.dark .toggle-slider {
+            background-color: #555;
+        }
+
+        html.dark ::-webkit-input-placeholder {
+            color: #8a8a9e;
+        }
+
+        html.dark ::-moz-placeholder {
+            color: #8a8a9e;
+            opacity: 1;
+        }
+
+        html.dark :-ms-input-placeholder {
+            color: #8a8a9e;
+        }
+
+        html.dark ::-ms-input-placeholder {
+            color: #8a8a9e;
+        }
+
+        html.dark ::placeholder {
+            color: #8a8a9e;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <a href="" class="logo-link">
+                <div class="logo">
+                    <span class="logo-icon">🍽️</span>
+                    <span>Smart Food</span>
+                </div>
+            </a>
+            <div class="user-profile">
+                <span class="welcome-text">Welcome back, John!</span>
+
+                <div class="theme-toggle" id="themeToggle" title="Toggle theme">
+                    <span class="theme-icon moon">🌙</span>
+                    <span class="theme-icon sun">☀️</span>
+                </div>
+
+                <div class="cart-widget-container">
+                    <div class="cart-icon" id="cartIcon">
+                        <span>🛒</span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </div>
+                    <div class="cart-popover" id="cartPopover">
+                        <div class="popover-content" id="popoverContent">
+                            <div class="popover-empty">Your cart is empty.</div>
+                        </div>
+                        <div class="popover-footer">
+                            <div class="popover-total">
+                                <strong>Total:</strong>
+                                <span id="popoverTotal">₹0</span>
+                            </div>
+                            <button id="popoverViewCartBtn" class="popover-btn">View Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-widget-container">
+                    <div class="profile-avatar" id="profileAvatar">JD</div>
+                    <div class="profile-popover" id="profilePopover">
+                        <div class="popover-profile-header">
+                            <div class="popover-avatar">JD</div>
+                            <div class="popover-user-info">
+                                <strong>John Doe</strong>
+                                <span>john.doe@email.com</span>
+                            </div>
+                        </div>
+                        <div class="popover-links">
+                            <a id="popoverProfileBtn" class="popover-link">👤 View Profile</a>
+                            <a id="popoverSettingsBtn" class="popover-link">⚙️ Settings</a>
+                            <a id="popoverLogoutBtn" class="popover-link logout">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Health Status</h3>
+                <div class="health-status">
+                    <div class="health-status-title">Active Conditions</div>
+                    <div id="healthConditions">
+                        <span class="health-condition">Diabetes Type 2</span>
+                        <span class="health-condition">Hypertension</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Navigation</h3>
+                <div class="sidebar-item active" data-section="dashboard">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="sidebar-item" data-section="health-recommendations">
+                    <span>🏥</span>
+                    <span>Health Recommendations</span>
+                </div>
+                <div class="sidebar-item" data-section="recommendations">
+                    <span>🎯</span>
+                    <span>All Recommendations</span>
+                </div>
+                <div class="sidebar-item" data-section="cart">
+                    <span>🛒</span>
+                    <span>My Cart</span>
+                </div>
+                <div class="sidebar-item" data-section="favorites">
+                    <span>❤️</span>
+                    <span>Favorites</span>
+                </div>
+                <div class="sidebar-item" data-section="history">
+                    <span>📋</span>
+                    <span>Order History</span>
+                </div>
+                <div class="sidebar-item" data-section="profile">
+                    <span>👤</span>
+                    <span>Profile</span>
+                </div>
+                <div class="sidebar-item" data-section="settings">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Filters & Sorting</h3>
+                <div class="filter-group">
+                    <label class="filter-label" for="healthFilter">Health Focus</label>
+                    <select id="healthFilter" class="filter-select">
+                        <option value="">All Foods</option>
+                        <option value="diabetes-friendly">Diabetes Friendly</option>
+                        <option value="heart-healthy">Heart Healthy</option>
+                        <option value="low-sodium">Low Sodium</option>
+                        <option value="high-fiber">High Fiber</option>
+                        <option value="low-sugar">Low Sugar</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="cuisineFilter">Cuisine</label>
+                    <select id="cuisineFilter" class="filter-select">
+                        <option value="">All Cuisines</option>
+                        <option value="indian">Indian</option>
+                        <option value="mediterranean">Mediterranean</option>
+                        <option value="chinese">Chinese</option>
+                        <option value="continental">Continental</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="sortFilter">Sort By</label>
+                    <select id="sortFilter" class="filter-select">
+                        <option value="default">Default (Recommended)</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="rating-desc">Rating: High to Low</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="mainDashboardView">
+                <div class="health-alert">
+                    <div class="health-alert-icon">🏥</div>
+                    <div class="health-alert-content">
+                        <h4>Health-Based Recommendations Active</h4>
+                        <p>Food suggestions are tailored to your diabetes and hypertension management needs.</p>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search for food, restaurants, or cuisines..."
+                        id="searchInput">
+                    <button class="search-btn" id="searchBtn">🔍</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏥</div>
+                        <div class="stat-number" data-count="28">0</div>
+                        <div class="stat-label">Health Recommendations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❤️</div>
+                        <div class="stat-number" data-count="15">0</div>
+                        <div class="stat-label">Heart-Healthy Options</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🍃</div>
+                        <div class="stat-number" data-count="12">0</div>
+                        <div class="stat-label">Diabetes-Friendly</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-number" data-count="4.9">0</div>
+                        <div class="stat-label">Health Rating</div>
+                    </div>
+                </div>
+
+                <section class="section" id="healthSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Health-Based Recommendations</h2>
+                        <span class="health-recommendation-badge">Personalized for Your Health</span>
+                    </div>
+                    <div class="food-grid" id="healthRecommendationsGrid">
+                    </div>
+                </section>
+
+                <section class="section" id="safeSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Safe Options for You</h2>
+                        <button class="view-all-btn">View All</button>
+                    </div>
+                    <div class="food-grid" id="safeOptionsGrid">
+                    </div>
+                </section>
+
+                <section class="section" id="moderateSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Moderate Consumption</h2>
+                        <button class="view-all-btn">View All</button>
+                    </div>
+                    <div class="food-grid" id="moderateGrid">
+                    </div>
+                </section>
+            </div>
+            <section class="section" id="cartSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Your Shopping Cart</h2>
+                </div>
+                <div class="cart-container" id="cartContainer">
+                </div>
+            </section>
+
+            <section class="section" id="favoritesSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Your Favorites</h2>
+                </div>
+                <div class="food-grid" id="favoritesGrid">
+                </div>
+            </section>
+
+            <section class="section" id="historySection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Your Order History</h2>
+                </div>
+                <div class="order-history-list" id="historyList">
+                </div>
+            </section>
+
+            <section class="section" id="settingsSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Settings</h2>
+                </div>
+
+                <div class="settings-layout">
+                    <nav class="settings-nav">
+                        <div class="settings-nav-item active" onclick="showSettingsTab('account', this)">
+                            <span>👤</span><span>Account</span>
+                        </div>
+                        <div class="settings-nav-item" onclick="showSettingsTab('health', this)">
+                            <span>🏥</span><span>Health Profile</span>
+                        </div>
+                        <div class="settings-nav-item" onclick="showSettingsTab('notifications', this)">
+                            <span>🔔</span><span>Notifications</span>
+                        </div>
+                        <div class="settings-nav-item" onclick="showSettingsTab('preferences', this)">
+                            <span>🎨</span><span>Preferences</span>
+                        </div>
+                    </nav>
+
+                    <div class="settings-content">
+                        <div id="settings-tab-account" class="settings-tab-pane" style="display: block;">
+                            <h3 class="setting-section-title">Account Details</h3>
+                            <div class="form-group">
+                                <label for="acc-name">Full Name</label>
+                                <input type="text" id="acc-name" value="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label for="acc-email">Email Address</label>
+                                <input type="email" id="acc-email" value="john.doe@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="acc-pass">New Password</label>
+                                <input type="password" id="acc-pass" placeholder="Enter new password">
+                            </div>
+                            <button class="save-btn" onclick="saveAccountSettings()">Save Changes</button>
+                        </div>
+
+                        <div id="settings-tab-health" class="settings-tab-pane">
+                            <h3 class="setting-section-title">Manage Health Profile</h3>
+                            <div class="form-group">
+                                <label>Active Health Conditions</label>
+                                <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1rem;">Changes here will
+                                    immediately update your food recommendations.</p>
+                                <div class="checkbox-group" id="healthConditionsList">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Main Health Goals</label>
+                                <div class="checkbox-group" id="healthGoalsList">
+                                </div>
+                            </div>
+                            <button class="save-btn" onclick="saveHealthSettings()">Save Health Profile</button>
+                        </div>
+
+                        <div id="settings-tab-notifications" class="settings-tab-pane">
+                            <h3 class="setting-section-title">Notification Settings</h3>
+                            <div class="toggle-switch">
+                                <span>Enable Health Tips</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-health-tips">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-switch">
+                                <span>Email me Order Updates</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-order-email" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-switch">
+                                <span>Notify of Health Conflicts</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-health-alerts" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <button class="save-btn" style="margin-top: 1.5rem;"
+                                onclick="saveNotificationSettings()">Save Notifications</button>
+                        </div>
+
+                        <div id="settings-tab-preferences" class="settings-tab-pane">
+                            <h3 class="setting-section-title">App Preferences</h3>
+                            <div class="form-group">
+                                <label for="defaultSortSelect">Default Dashboard Sort</label>
+                                <select id="defaultSortSelect" class="filter-select">
+                                    <option value="default">Default (Recommended)</option>
+                                    <option value="price-asc">Price: Low to High</option>
+                                    <option value="price-desc">Price: High to Low</option>
+                                    <option value="rating-desc">Rating: High to Low</option>
+                                </select>
+                            </div>
+                            <button class="save-btn" onclick="savePreferencesSettings()">Save Preferences</button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button class="fab" id="fabBtn" title="AI Health Assistant">💬</button>
+
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">✕</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Recipe Details</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATA (Restored `let` for profile, but `const` for history) ---
+        let userHealthProfile = { conditions: ["diabetes", "hypertension"], allergies: ["nuts"], medications: ["metformin", "lisinopril"], goals: ["weight-loss", "better-health"], diet: "vegetarian" };
+        const orderHistoryData = [{ orderId: "SF00123", date: "2025-09-01", total: "₹270", status: "Delivered", items: [{ name: "Quinoa Salad Bowl", qty: 1 }, { name: "Moong Dal", qty: 1 }] }, { orderId: "SF00121", date: "2025-08-25", total: "₹580", status: "Delivered", items: [{ name: "Grilled Salmon", qty: 1 }, { name: "Cucumber Raita", qty: 2 }] }, { orderId: "SF00124", date: "2025-09-05", total: "₹120", status: "Processing", items: [{ name: "Vegetable Daliya", qty: 1 }] }];
+        // --- UPDATED DATA WITH `isVegetarian` property ---
+        const favoriteFoodData = [{ id: 2, emoji: "🐟", title: "Grilled Salmon", description: "Omega-3 rich salmon grilled with herbs - excellent for heart health", rating: 4.9, price: 420, tags: ["Heart-Healthy", "High Protein", "Anti-inflammatory"], healthBenefits: ["Omega-3 Fatty Acids", "Low Sodium", "Lean Protein"], cuisine: "continental", healthCategory: "recommended", healthReason: "Rich in omega-3 fatty acids which help reduce blood pressure and inflammation.", nutritionalInfo: { carbs: "0g", protein: "25g", fiber: "0g", sodium: "80mg" }, isVegetarian: false }, { id: 5, emoji: "🥘", title: "Moong Dal", description: "Yellow lentils cooked with minimal spices - gentle on digestion", rating: 4.7, price: 90, tags: ["High Protein", "Easy Digest", "Low Fat"], healthBenefits: ["Plant Protein", "B Vitamins", "Iron Rich"], cuisine: "indian", healthCategory: "safe", healthReason: "Excellent source of plant protein with minimal impact on blood sugar.", nutritionalInfo: { carbs: "15g", protein: "12g", fiber: "6g", sodium: "100mg" }, isVegetarian: true }];
+        const healthAwareFoodData = { healthRecommendations: [{ id: 1, emoji: "🥗", title: "Quinoa Salad Bowl", description: "Low glycemic index quinoa with fresh vegetables - perfect for blood sugar management", rating: 4.8, price: 180, tags: ["Diabetes-Friendly", "Heart-Healthy", "High Fiber"], healthBenefits: ["Low GI", "Rich in Protein", "Heart Healthy"], cuisine: "continental", healthCategory: "recommended", healthReason: "Low glycemic index helps maintain stable blood sugar levels. High fiber content aids in diabetes management.", nutritionalInfo: { carbs: "22g", protein: "8g", fiber: "5g", sodium: "120mg" }, isVegetarian: true }, { id: 2, emoji: "🐟", title: "Grilled Salmon", description: "Omega-3 rich salmon grilled with herbs - excellent for heart health", rating: 4.9, price: 420, tags: ["Heart-Healthy", "High Protein", "Anti-inflammatory"], healthBenefits: ["Omega-3 Fatty Acids", "Low Sodium", "Lean Protein"], cuisine: "continental", healthCategory: "recommended", healthReason: "Rich in omega-3 fatty acids which help reduce blood pressure and inflammation.", nutritionalInfo: { carbs: "0g", protein: "25g", fiber: "0g", sodium: "80mg" }, isVegetarian: false }, { id: 3, emoji: "🥒", title: "Cucumber Raita", description: "Cooling yogurt-based dish with low sodium and high probiotics", rating: 4.5, price: 80, tags: ["Low Sodium", "Probiotic", "Cooling"], healthBenefits: ["Probiotics", "Low Calorie", "Hydrating"], cuisine: "indian", healthCategory: "recommended", healthReason: "Low in sodium, helps with blood pressure management. Probiotics support digestive health.", nutritionalInfo: { carbs: "8g", protein: "4g", fiber: "2g", sodium: "45mg" }, isVegetarian: true }], safeOptions: [{ id: 4, emoji: "🍲", title: "Vegetable Daliya", description: "Broken wheat porridge with mixed vegetables - wholesome and filling", rating: 4.6, price: 120, tags: ["High Fiber", "Low GI", "Vegetarian"], healthBenefits: ["Sustained Energy", "High Fiber", "Low Fat"], cuisine: "indian", healthCategory: "safe", healthReason: "Complex carbohydrates provide sustained energy without blood sugar spikes.", nutritionalInfo: { carbs: "28g", protein: "6g", fiber: "8g", sodium: "150mg" }, isVegetarian: true }, { id: 5, emoji: "🥘", title: "Moong Dal", description: "Yellow lentils cooked with minimal spices - gentle on digestion", rating: 4.7, price: 90, tags: ["High Protein", "Easy Digest", "Low Fat"], healthBenefits: ["Plant Protein", "B Vitamins", "Iron Rich"], cuisine: "indian", healthCategory: "safe", healthReason: "Excellent source of plant protein with minimal impact on blood sugar.", nutritionalInfo: { carbs: "15g", protein: "12g", fiber: "6g", sodium: "100mg" }, isVegetarian: true }, { id: 6, emoji: "🥬", title: "Palak Paneer (Low Salt)", description: "Spinach curry with cottage cheese, prepared with minimal salt", rating: 4.4, price: 160, tags: ["Iron Rich", "Low Sodium", "Calcium Rich"], healthBenefits: ["Iron", "Calcium", "Folate"], cuisine: "indian", healthCategory: "safe", healthReason: "Iron-rich spinach supports healthy blood. Low sodium version helps with blood pressure.", nutritionalInfo: { carbs: "10g", protein: "14g", fiber: "4g", sodium: "200mg" }, isVegetarian: true }], moderateOptions: [{ id: 7, emoji: "🍛", title: "Brown Rice Pulao", description: "Aromatic brown rice with vegetables - consume in moderation", rating: 4.2, price: 140, tags: ["Whole Grain", "Moderate GI", "Portion Control"], healthBenefits: ["Whole Grain", "B Vitamins", "Manganese"], healthWarnings: ["Watch Portion Size"], cuisine: "indian", healthCategory: "moderate", healthReason: "Brown rice has moderate glycemic index. Portion control recommended for diabetes management.", nutritionalInfo: { carbs: "35g", protein: "5g", fiber: "3g", sodium: "180mg" }, isVegetarian: true }, { id: 8, emoji: "🥭", title: "Mango Lassi (Sugar-free)", description: "Sweet mango yogurt drink with natural sweetener", rating: 4.0, price: 100, tags: ["Probiotic", "Sugar-free", "Limited Serving"], healthBenefits: ["Probiotics", "Vitamin C", "Calcium"], healthWarnings: ["Natural Fruit Sugars"], cuisine: "indian", healthCategory: "moderate", healthReason: "Contains natural fruit sugars. Limit to small portions to manage blood sugar.", nutritionalInfo: { carbs: "18g", protein: "6g", fiber: "1g", sodium: "65mg" }, isVegetarian: true }] };
+        const mockRestaurants = [
+            { name: "Healthy Eats Cafe", healthRating: 4.8 },
+            { name: "The Green Leaf Bistro", healthRating: 4.6 },
+            { name: "FitFood Kitchen", healthRating: 4.9 },
+            { name: "Nourish & Co.", healthRating: 4.5 },
+            { name: "Earthly Delights", healthRating: 4.2 }
+        ];
+
+        // --- App-wide Settings Object (Restored) ---
+        let userSettings = {
+            notifications: {
+                healthTips: true,
+                orderEmail: true,
+                healthAlerts: true
+            },
+            preferences: {
+                defaultSort: 'default'
+            }
+        };
+
+        // --- Global State ---
+        let shoppingCart = {};
+        const filters = { health: document.getElementById('healthFilter'), cuisine: document.getElementById('cuisineFilter') };
+        let currentFilters = { health: '', cuisine: '', search: '' };
+        let currentSort = 'default';
+
+        // --- Global DOM variables ---
+        const searchInput = document.getElementById('searchInput'), searchBtn = document.getElementById('searchBtn'), fabBtn = document.getElementById('fabBtn'), recipeModal = document.getElementById('recipeModal'), closeModal = document.getElementById('closeModal'), modalTitle = document.getElementById('modalTitle'), modalBody = document.getElementById('modalBody'), sidebarItems = document.querySelectorAll('.sidebar-item');
+        const cartIcon = document.getElementById('cartIcon');
+        const cartCountEl = document.getElementById('cartCount');
+        const popoverContent = document.getElementById('popoverContent');
+        const popoverTotal = document.getElementById('popoverTotal');
+
+        // --- Section Variables (Restored) ---
+        const mainDashboardView = document.getElementById('mainDashboardView');
+        const healthSection = document.getElementById('healthSection');
+        const safeSection = document.getElementById('safeSection');
+        const moderateSection = document.getElementById('moderateSection');
+        const favoritesSection = document.getElementById('favoritesSection');
+        const historySection = document.getElementById('historySection');
+        const cartSection = document.getElementById('cartSection');
+        const settingsSection = document.getElementById('settingsSection'); // Settings section is back
+        const cartContainer = document.getElementById('cartContainer');
+
+        // ======== NEW THEME TOGGLE JAVASCRIPT ========
+        const rootEl = document.documentElement;
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                rootEl.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                rootEl.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function toggleTheme() {
+            if (rootEl.classList.contains('dark')) {
+                applyTheme('light');
+            } else {
+                applyTheme('dark');
+            }
+        }
+
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                // If user has a saved preference, use it
+                applyTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // If no saved preference, check OS setting
+                applyTheme('dark');
+            } else {
+                // Default to light
+                applyTheme('light');
+            }
+        }
+        // ======== END NEW THEME JAVASCRIPT ========
+
+
+        // --- DATA & PRICE HELPER FUNCTIONS ---
+        function getAllFoodData() {
+            return [...healthAwareFoodData.healthRecommendations, ...healthAwareFoodData.safeOptions, ...healthAwareFoodData.moderateOptions, ...favoriteFoodData];
+        }
+        function findFoodById(itemId) {
+            const allFoodMap = new Map();
+            getAllFoodData().forEach(item => {
+                if (!allFoodMap.has(item.id)) {
+                    allFoodMap.set(item.id, item);
+                }
+            });
+            return allFoodMap.get(itemId);
+        }
+        function getRestaurantPriceModifier(restaurantName) {
+            let hash = 0;
+            for (let i = 0; i < restaurantName.length; i++) {
+                hash = (hash << 5) - hash + restaurantName.charCodeAt(i);
+                hash |= 0;
+            }
+            const modifierRange = 0.25;
+            const normalizedHash = (Math.abs(hash) % 100) / 100;
+            return (normalizedHash * modifierRange) - 0.10;
+        }
+        function getSpecificRestaurantPrice(basePrice, restaurantName) {
+            const modifier = getRestaurantPriceModifier(restaurantName);
+            const specificPrice = basePrice + (basePrice * modifier);
+            return Math.round(specificPrice / 5) * 5;
+        }
+        function getPriceRange(basePrice) {
+            const minPrice = Math.floor(basePrice + (basePrice * -0.10));
+            const maxPrice = Math.floor(basePrice + (basePrice * 0.15));
+            const cleanMin = Math.floor(minPrice / 5) * 5;
+            const cleanMax = Math.ceil(maxPrice / 5) * 5;
+            if (cleanMin === cleanMax) return `₹${cleanMin}`;
+            return `₹${cleanMin} - ₹${cleanMax}`;
+        }
+
+        // --- RATING HELPER FUNCTIONS ---
+        function getSpecificRestaurantRating(baseRating, restaurantName) {
+            const modifier = getRestaurantPriceModifier(restaurantName);
+            let ratingChange = modifier * 2;
+            let specificRating = baseRating + ratingChange;
+            if (specificRating > 5.0) specificRating = 5.0;
+            if (specificRating < 3.5) specificRating = 3.5;
+            return specificRating;
+        }
+        function calculateAverageRating(baseRating) {
+            const allRatings = mockRestaurants.map(restaurant => {
+                return getSpecificRestaurantRating(baseRating, restaurant.name);
+            });
+            const sum = allRatings.reduce((acc, rating) => acc + rating, 0);
+            const avg = sum / allRatings.length;
+            return avg.toFixed(1);
+        }
+
+        // --- SORTING FUNCTION ---
+        function sortFoodData(dataArray) {
+            const sortedArray = [...dataArray];
+            switch (currentSort) {
+                case 'price-asc':
+                    sortedArray.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    sortedArray.sort((a, b) => b.price - a.price);
+                    break;
+                case 'rating-desc':
+                    sortedArray.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'default':
+                default:
+                    break;
+            }
+            return sortedArray;
+        }
+
+        // --- CORE APP FUNCTIONS ---
+        function initDashboard() {
+            // Load settings on init
+            currentSort = userSettings.preferences.defaultSort;
+            document.getElementById('sortFilter').value = currentSort;
+
+            initializeTheme(); // <-- ADDED: Set theme on load
+
+            displayHealthConditions();
+            displayFoodCards();
+            displayOrderHistory();
+            animateStats();
+            setupEventListeners();
+            updateAllCartUI();
+            const initialView = location.hash.substring(1) || 'dashboard';
+            showView(initialView, true);
+        }
+
+        function displayHealthConditions() {
+            const healthConditionsEl = document.getElementById('healthConditions');
+            if (healthConditionsEl) {
+                const conditionLabels = { 'diabetes': 'Diabetes Type 2', 'hypertension': 'Hypertension', 'high-cholesterol': 'High Cholesterol', 'kidney-disease': 'Kidney Disease' };
+                if (userHealthProfile.conditions.length > 0) {
+                    healthConditionsEl.innerHTML = userHealthProfile.conditions.map(c => `<span class="health-condition">${conditionLabels[c] || c}</span>`).join('');
+                } else {
+                    healthConditionsEl.innerHTML = `<span style="font-size: 0.8rem; color: #7f8c8d;">No conditions listed.</span>`;
+                }
+            }
+        }
+
+        // ======== THIS FUNCTION IS NOW UPDATED FOR SEARCH LOGIC & NEW TAGS ========
+        function displayFoodCards() {
+            // Get all the section elements we need to toggle
+            const healthSectionEl = document.getElementById('healthSection');
+            const safeSectionEl = document.getElementById('safeSection');
+            const moderateSectionEl = document.getElementById('moderateSection');
+            const healthGridEl = document.getElementById('healthRecommendationsGrid');
+
+            // Get the title and badge elements so we can change them
+            const healthTitleEl = healthSectionEl.querySelector('.section-title');
+            const healthBadgeEl = healthSectionEl.querySelector('.health-recommendation-badge');
+
+            if (currentFilters.search) {
+                // --- SEARCH MODE IS ACTIVE ---
+
+                // 1. Hide the other dashboard sections
+                safeSectionEl.style.display = 'none';
+                moderateSectionEl.style.display = 'none';
+
+                // 2. Modify the main section to become a "Search Results" section
+                healthSectionEl.style.display = 'block';
+                healthTitleEl.textContent = `Search Results for "${currentFilters.search}"`;
+                healthBadgeEl.style.display = 'none'; // Hide the "Personalized" badge
+
+                // 3. Get ALL dashboard food, filter it, and sort it
+                const allDashboardFood = [
+                    ...healthAwareFoodData.healthRecommendations,
+                    ...healthAwareFoodData.safeOptions,
+                    ...healthAwareFoodData.moderateOptions
+                ];
+
+                // filterFoodData function already applies ALL current filters (search, health dropdown, cuisine dropdown)
+                const searchResults = filterFoodData(allDashboardFood);
+                const finalResults = sortFoodData(searchResults);
+
+                // 4. Render the final results directly into the (now repurposed) health grid
+                if (finalResults.length === 0) {
+                    healthGridEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤷</div><p>No items match your filters or search.</p></div>';
+                } else {
+                    healthGridEl.innerHTML = finalResults.map(item => createHealthAwareFoodCard(item)).join('');
+                }
+
+            } else {
+                // --- DEFAULT DASHBOARD MODE (NO SEARCH) ---
+
+                // 1. Restore section visibility
+                safeSectionEl.style.display = 'block';
+                moderateSectionEl.style.display = 'block';
+                healthSectionEl.style.display = 'block';
+
+                // 2. Restore main section title and badge
+                healthTitleEl.textContent = 'Health-Based Recommendations';
+                healthBadgeEl.style.display = 'inline-block'; // Restore badge
+
+                // 3. Run the original display logic (each section filters its own data)
+                displayFoodSection('healthRecommendations', healthAwareFoodData.healthRecommendations);
+                displayFoodSection('safeOptions', healthAwareFoodData.safeOptions);
+                displayFoodSection('moderate', healthAwareFoodData.moderateOptions);
+            }
+
+            // Always display/update the favorites grid (its main visibility is controlled by showView function)
+            displayFoodSection('favorites', favoriteFoodData);
+        }
+
+        function displayFoodSection(section, data) {
+            const grid = document.getElementById(section + 'Grid');
+            if (!grid) return;
+            const filteredData = filterFoodData(data); // This filters the specific data array passed to it
+            const finalData = sortFoodData(filteredData);
+
+            if (finalData.length === 0) {
+                // Don't show an empty state message for dashboard sections unless it's the favorites page
+                if (section === 'favorites') {
+                    grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">❤️</div><p>You have no favorite items yet.</p></div>';
+                } else {
+                    // Hide the grid, but don't show an error (we do that only for a global search)
+                    grid.innerHTML = '';
+                }
+
+                // If search is active, we don't need this logic (it's handled in displayFoodCards)
+                // This is to prevent "no items" message from appearing in default dashboard sections when filters are set
+                if (currentFilters.search && section !== 'favorites') {
+                    grid.innerHTML = ''; // Search handles its own empty state
+                }
+
+            } else {
+                grid.innerHTML = finalData.map(item => createHealthAwareFoodCard(item)).join('');
+            }
+        }
+
+
+        function displayOrderHistory() {
+            const list = document.getElementById('historyList');
+            if (!list) return;
+            if (orderHistoryData.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>You have no past orders.</p></div>';
+            } else {
+                const sortedHistory = orderHistoryData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                list.innerHTML = sortedHistory.map(order => createOrderHistoryCard(order)).join('');
+            }
+        }
+
+        function createOrderHistoryCard(order) {
+            const itemsHtml = order.items.map(item => `<li>${item.qty} x ${item.name}</li>`).join('');
+            const statusClass = order.status.toLowerCase();
+            return `<div class="order-history-item"><div class="order-history-header"><div><div class="order-id">Order #${order.orderId}</div><div style="font-size: 0.8rem; color: #7f8c8d;">${order.date}</div></div><span class="order-status ${statusClass}">${order.status}</span></div><div class="order-details"><div><strong>Items:</strong><ul class="order-items-list">${itemsHtml}</ul></div><div style="text-align: right;"><strong>Total:</strong><div style="font-weight: 600; font-size: 1.2rem; color: #e74c3c;">${order.total}</div></div></div><div style="text-align: right;"><button class="order-reorder-btn" onclick="reorder('${order.orderId}')">Reorder</button></div></div>`;
+        }
+
+        function filterFoodData(data) {
+            // This function checks the GLOBAL filters against ANY data array passed to it
+            return data.filter(item => {
+                const healthMatch = !currentFilters.health || item.tags.some(t => t.toLowerCase().includes(currentFilters.health.replace('-', ' '))) || item.healthBenefits.some(b => b.toLowerCase().includes(currentFilters.health.replace('-', ' ')));
+                const cuisineMatch = !currentFilters.cuisine || item.cuisine === currentFilters.cuisine;
+                const searchMatch = !currentFilters.search || item.title.toLowerCase().includes(currentFilters.search.toLowerCase()) || item.description.toLowerCase().includes(currentFilters.search.toLowerCase()) || item.tags.some(t => t.toLowerCase().includes(currentFilters.search.toLowerCase()));
+                return healthMatch && cuisineMatch && searchMatch;
+            });
+        }
+
+        // --- UPDATED `createHealthAwareFoodCard` to include a veg/non-veg tag ---
+        function createHealthAwareFoodCard(item) {
+            const healthClass = `health-${item.healthCategory}`;
+            const healthTags = item.healthBenefits.map(b => `<span class="health-benefit-tag">${b}</span>`).join('');
+            const warningTags = (item.healthWarnings || []).map(w => `<span class="health-warning-tag">${w}</span>`).join('');
+            const avgRating = calculateAverageRating(item.rating);
+
+            // NEW: Determine the veg/non-veg tag
+            const vegTag = item.isVegetarian ? `<span class="food-veg-tag">🌿 Veg</span>` : `<span class="food-nonveg-tag">🍗 Non-Veg</span>`;
+
+            return `<div class="food-card ${healthClass}" data-id="${item.id}" onclick="openRecipeModal(${item.id})">
+                                <div class="food-image">${item.emoji}</div>
+                                <div class="food-info">
+                                    <h3 class="food-title">${item.title}</h3>
+                                    <p class="food-description">${item.description}</p>
+                                    <div class="food-tags">
+                                        ${vegTag}
+                                        ${item.tags.map(t => `<span class="food-tag">${t}</span>`).join('')}
+                                        ${healthTags}
+                                        ${warningTags}
+                                    </div>
+                                    <div class="food-meta">
+                                        <div class="food-rating">
+                                            <span>⭐</span>
+                                            <span>${avgRating}</span>
+                                            <span class="rating-avg-label">(Avg)</span>
+                                        </div>
+                                        <div class="food-price">${getPriceRange(item.price)}</div>
+                                    </div>
+                                </div>
+                            </div>`;
+        }
+
+        function animateStats() {
+            document.querySelectorAll('.stat-number').forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-count')), increment = target / 100;
+                let current = 0;
+                const update = () => { if (current < target) { current += increment; counter.textContent = target % 1 !== 0 ? current.toFixed(1) : Math.ceil(current); setTimeout(update, 20); } else { counter.textContent = target; } };
+                update();
+            });
+        }
+
+        function setupEventListeners() {
+            // ======== ADDED THEME TOGGLE LISTENER ========
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+            // Click and Enter listeners still work, running the same function
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+
+            // ======== THIS IS THE UPDATED REALTIME SEARCH LISTENER ========
+            // Runs performSearch() on every keystroke, paste, or delete.
+            searchInput.addEventListener('input', performSearch);
+
+
+            // --- REMOVED Hoverable Dropdowns JavaScript ---
+
+
+            Object.keys(filters).forEach(type => {
+                filters[type].addEventListener('change', e => {
+                    currentFilters[type] = e.target.value;
+                    displayFoodCards();
+                });
+            });
+
+            const sortFilter = document.getElementById('sortFilter');
+            sortFilter.addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                displayFoodCards();
+            });
+
+            sidebarItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const viewName = item.getAttribute('data-section');
+                    navigateTo(viewName);
+                });
+            });
+
+            const viewAllBtns = document.querySelectorAll('.view-all-btn');
+            viewAllBtns.forEach(btn => {
+                const parentSection = btn.closest('.section');
+                const gridId = parentSection.querySelector('.food-grid').id;
+                let viewName;
+                if (gridId === 'safeOptionsGrid') viewName = 'view-safe-options';
+                else if (gridId === 'moderateGrid') viewName = 'view-moderate-options';
+                if (viewName) {
+                    btn.addEventListener('click', () => navigateTo(viewName));
+                }
+            });
+
+            closeModal.addEventListener('click', closeRecipeModal);
+            recipeModal.addEventListener('click', e => { if (e.target === recipeModal) closeRecipeModal(); });
+
+            // ======== FAB BUTTON ACTION UPDATED ========
+            fabBtn.addEventListener('click', () => showNotification('AI Health Assistant coming soon!', 'info'));
+
+            cartIcon.addEventListener('click', () => navigateTo('cart'));
+            document.getElementById('popoverViewCartBtn').addEventListener('click', () => {
+                navigateTo('cart');
+            });
+
+            // --- Profile Popover Listeners (Restored) ---
+            document.getElementById('profileAvatar').addEventListener('click', () => navigateTo('profile'));
+            document.getElementById('popoverProfileBtn').addEventListener('click', () => navigateTo('profile'));
+            document.getElementById('popoverSettingsBtn').addEventListener('click', () => navigateTo('settings')); // Re-wired to settings page
+            document.getElementById('popoverLogoutBtn').addEventListener('click', handleLogout);
+        }
+
+        // ======== THIS FUNCTION IS NOW UPDATED (Notification removed) ========
+        function performSearch() {
+            currentFilters.search = searchInput.value.trim();
+            displayFoodCards(); // This function now contains all the search/restore logic
+
+            /* NOTIFICATION REMOVED FOR REALTIME SEARCH
+                Firing on every keystroke is annoying. The visual change is the only feedback needed.
+            if (currentFilters.search) {
+                showNotification(`Searching for health-friendly "${currentFilters.search}"...`, 'info');
+            }
+            */
+        }
+
+        // --- NAVIGATION & VIEW FUNCTIONS (Restored) ---
+        function navigateTo(viewName) {
+            const currentHash = location.hash.substring(1);
+            if (currentHash === viewName && viewName === 'profile') {
+                openProfileModal();
+                return;
+            }
+            if (currentHash === viewName) return;
+
+            showView(viewName);
+            if (viewName !== 'profile') {
+                history.pushState({ view: viewName }, "", `#${viewName}`);
+            } else if (currentHash !== 'dashboard' && currentHash !== 'recommendations') {
+                history.pushState({ view: viewName }, "", `#${viewName}`);
+            }
+        }
+
+        function showView(viewName, isInitialLoad = false) {
+            // Hide all main sections
+            [mainDashboardView, favoritesSection, historySection, cartSection, settingsSection].forEach(s => s.style.display = 'none');
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            let notificationMessage = '';
+
+            // When changing views, ALWAYS clear the search filter and restore the dashboard
+            if (currentFilters.search) {
+                currentFilters.search = '';
+                searchInput.value = '';
+                // No need to call displayFoodCards() here, it will be called by the logic below
+            }
+
+            switch (viewName) {
+                case 'dashboard':
+                case 'recommendations':
+                    mainDashboardView.style.display = 'block';
+                    displayFoodCards(); // This will now run the "else" block (restore logic)
+                    const itemToActivate = viewName === 'dashboard' ? 'dashboard' : 'recommendations';
+                    const activeItem = document.querySelector(`.sidebar-item[data-section="${itemToActivate}"]`);
+                    if (activeItem) activeItem.classList.add('active');
+                    notificationMessage = itemToActivate === 'dashboard' ? 'Dashboard view loaded' : 'All recommendations loaded';
+                    break;
+                case 'health-recommendations':
+                    mainDashboardView.style.display = 'block';
+                    displayFoodCards(); // Run restore logic
+                    document.getElementById('safeSection').style.display = 'none'; // Then hide sections
+                    document.getElementById('moderateSection').style.display = 'none';
+                    document.querySelector('.sidebar-item[data-section="health-recommendations"]').classList.add('active');
+                    notificationMessage = 'Health-based recommendations loaded';
+                    break;
+                case 'cart':
+                    cartSection.style.display = 'block';
+                    document.querySelector('.sidebar-item[data-section="cart"]').classList.add('active');
+                    renderCartView();
+                    notificationMessage = 'Shopping cart loaded';
+                    break;
+                case 'favorites':
+                    favoritesSection.style.display = 'block';
+                    displayFoodSection('favorites', favoriteFoodData); // Just render favorites
+                    document.querySelector('.sidebar-item[data-section="favorites"]').classList.add('active');
+                    notificationMessage = 'Your favorite dishes loaded';
+                    break;
+                case 'history':
+                    historySection.style.display = 'block';
+                    document.querySelector('.sidebar-item[data-section="history"]').classList.add('active');
+                    displayOrderHistory(); // Refresh history view
+                    notificationMessage = 'Order history loaded';
+                    break;
+                case 'profile':
+                    mainDashboardView.style.display = 'block';
+                    displayFoodCards(); // Restore dashboard view
+                    const profileItem = document.querySelector('.sidebar-item[data-section="profile"]');
+                    if (profileItem) profileItem.classList.add('active');
+                    openProfileModal();
+                    break;
+                // --- Settings Case is BACK ---
+                case 'settings':
+                    settingsSection.style.display = 'block';
+                    const settingsItem = document.querySelector('.sidebar-item[data-section="settings"]');
+                    if (settingsItem) settingsItem.classList.add('active');
+                    showSettingsTab('account', document.querySelector('.settings-nav-item'));
+                    loadHealthSettings();
+                    loadNotificationSettings();
+                    loadPreferencesSettings();
+                    notificationMessage = 'Settings loaded';
+                    break;
+                case 'view-safe-options':
+                    mainDashboardView.style.display = 'block';
+                    displayFoodCards(); // Restore dashboard
+                    document.getElementById('healthSection').style.display = 'none'; // Hide other sections
+                    document.getElementById('moderateSection').style.display = 'none';
+                    notificationMessage = 'Showing all "Safe Options for You"';
+                    break;
+                case 'view-moderate-options':
+                    mainDashboardView.style.display = 'block';
+                    displayFoodCards(); // Restore dashboard
+                    document.getElementById('healthSection').style.display = 'none'; // Hide other sections
+                    document.getElementById('safeSection').style.display = 'none';
+                    notificationMessage = 'Showing all "Moderate Consumption"';
+                    break;
+                default:
+                    mainDashboardView.style.display = 'block';
+                    displayFoodCards(); // Restore dashboard
+                    const dashItem = document.querySelector('.sidebar-item[data-section="dashboard"]');
+                    if (dashItem) dashItem.classList.add('active');
+                    notificationMessage = 'Dashboard view loaded';
+            }
+            if (!isInitialLoad && notificationMessage) {
+                showNotification(notificationMessage, 'info');
+            }
+        }
+
+        window.addEventListener('popstate', (e) => {
+            let view = (e.state && e.state.view) ? e.state.view : (location.hash.substring(1) || 'dashboard');
+            showView(view);
+        });
+
+
+        // --- MODAL & CART FUNCTIONS ---
+
+        function openRecipeModal(itemId) {
+            const item = findFoodById(itemId);
+            if (!item) return;
+            modalTitle.textContent = item.title;
+            const avgRating = calculateAverageRating(item.rating);
+            modalBody.innerHTML = `<div style="text-align: center; margin-bottom: 2rem;"><div style="font-size: 6rem; margin-bottom: 1rem;">${item.emoji}</div><div class="food-tags">${item.tags.map(t => `<span class="food-tag">${t}</span>`).join('')}${item.healthBenefits.map(b => `<span class="health-benefit-tag">${b}</span>`).join('')}</div></div>${item.healthReason ? `<div class="health-recommendation-reason"><h5>Why This is ${item.healthCategory === 'recommended' ? 'Recommended' : item.healthCategory === 'safe' ? 'Safe' : 'For Moderate Consumption'}</h5><p>${item.healthReason}</p></div>` : ''}<div class="nutritional-info">${Object.entries(item.nutritionalInfo).map(([k, v]) => `<div class="nutritional-item"><div class="nutritional-value">${v}</div><div class="nutritional-label">${k.charAt(0).toUpperCase() + k.slice(1)}</div></div>`).join('')}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem"><div><h4 style="margin-bottom:.5rem;color:#2c3e50">Rating</h4><div style="display:flex;align-items:center;gap:.5rem"><span>⭐</span><span style="font-weight:600">${avgRating} (Avg)</span></div></div><div><h4 style="margin-bottom:.5rem;color:#2c3e50">Price Range</h4><div style="font-weight:600;color:#e74c3c;font-size:1.2rem">${getPriceRange(item.price)}</div></div></div><div style="margin-bottom:2rem"><h4 style="margin-bottom:1rem;color:#2c3e50">Description</h4><p style="line-height:1.6;color:#7f8c8d">${item.description}</p></div><div style="margin-bottom:2rem"><h4 style="margin-bottom:1rem;color:#2c3e50">Health Benefits</h4><ul style="list-style-type:none;padding:0">${item.healthBenefits.map(b => `<li style="padding:.5rem 0;border-bottom:1px solid #ecf0f1">• ${b}</li>`).join('')}</ul></div>${item.healthWarnings ? `<div style="margin-bottom:2rem;background:rgba(241,196,15,.1);padding:1rem;border-radius:8px;border-left:4px solid #f1c40f"><h4 style="margin-bottom:1rem;color:#f39c12">Health Considerations</h4><ul style="list-style-type:none;padding:0;color:#e67e22">${item.healthWarnings.map(w => `<li style="padding:.25rem 0">⚠️ ${w}</li>`).join('')}</ul></div>` : ''}<div style="display:flex;gap:1rem;margin-top:2rem"><button class="save-btn" onclick="addToCart(${item.id})" style="flex:1;">Add to Cart</button><button class="danger-btn" onclick="addToFavorites(${item.id})" style="flex:1;">Add to Favorites</button></div>`;
+            recipeModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => { modalBody.scrollTop = 0; }, 0);
+        }
+
+        function closeRecipeModal() {
+            document.body.style.overflow = '';
+            recipeModal.classList.remove('show');
+        }
+
+        function updateAllCartUI() {
+            updateCartCount();
+            updateCartPopover();
+        }
+
+        function updateCartCount() {
+            let totalItems = 0;
+            for (const itemArray of Object.values(shoppingCart)) {
+                totalItems += itemArray.reduce((sum, item) => sum + item.qty, 0);
+            }
+            cartCountEl.textContent = totalItems;
+            cartCountEl.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+
+        function updateCartPopover() {
+            const cartKeys = Object.keys(shoppingCart);
+            if (cartKeys.length === 0) {
+                popoverContent.innerHTML = '<div class="popover-empty">Your cart is empty.</div>';
+                popoverTotal.textContent = '₹0';
+                return;
+            }
+            let grandTotal = 0;
+            let itemsHtml = '';
+            for (const [restaurantName, itemsArray] of Object.entries(shoppingCart)) {
+                itemsArray.forEach(item => {
+                    const itemTotal = item.price * item.qty;
+                    grandTotal += itemTotal;
+                    itemsHtml += `
+                        <div class="popover-item">
+                            <span class="popover-item-qty">${item.qty}x</span>
+                            <div class="popover-item-info">
+                                <div class="popover-item-title">${item.title}</div>
+                                <div class="popover-item-restaurant">from ${restaurantName}</div>
+                            </div>
+                            <span class="popover-item-price">₹${itemTotal}</span>
+                        </div>
+                    `;
+                });
+            }
+            popoverContent.innerHTML = itemsHtml;
+            popoverTotal.textContent = `₹${grandTotal}`;
+        }
+
+        function addToCart(itemId) {
+            closeRecipeModal();
+            openRestaurantSelector(itemId);
+        }
+
+        function openRestaurantSelector(itemId) {
+            const item = findFoodById(itemId);
+            modalTitle.textContent = `Get ${item.title} from...`;
+            const restaurantData = mockRestaurants.map(restaurant => ({
+                name: restaurant.name,
+                healthRating: restaurant.healthRating,
+                price: getSpecificRestaurantPrice(item.price, restaurant.name)
+            }));
+            restaurantData.sort((a, b) => b.healthRating - a.healthRating);
+            const restaurantButtonsHtml = restaurantData.map(data => {
+                const safeName = data.name.replace(/'/g, "\\'");
+                return `<button class="restaurant-select-btn" onclick="confirmAddToCart(${itemId}, '${safeName}')">
+                                <div>
+                                    <strong>${data.name}</strong>
+                                    <div class="restaurant-health-rating">⭐ ${data.healthRating} Health Rating</div>
+                                </div>
+                                <div>₹${data.price}</div>
+                            </button>`;
+            }).join('');
+            const sortControlsHtml = `
+                <div class="modal-sort-controls">
+                    <strong style="color: #2c3e50; font-size: 0.9rem; margin-right: 0.5rem;">Sort by:</strong>
+                    <span class="sort-tag active" onclick="sortRestaurantList('recommended', ${itemId}, this)">Recommended</span>
+                    <span class="sort-tag" onclick="sortRestaurantList('price-asc', ${itemId}, this)">Price: Low-High</span>
+                    <span class="sort-tag" onclick="sortRestaurantList('price-desc', ${itemId}, this)">Price: High-Low</span>
+                </div>
+            `;
+            modalBody.innerHTML = `
+                ${sortControlsHtml}
+                <div id="restaurantListContainer">
+                    ${restaurantButtonsHtml}
+                </div>`;
+            recipeModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => { modalBody.scrollTop = 0; }, 0);
+        }
+
+        function sortRestaurantList(sortKey, itemId, clickedElement) {
+            const item = findFoodById(itemId);
+            if (!item) return;
+            if (clickedElement) {
+                const siblings = clickedElement.parentNode.querySelectorAll('.sort-tag');
+                siblings.forEach(tag => tag.classList.remove('active'));
+                clickedElement.classList.add('active');
+            }
+            const restaurantData = mockRestaurants.map(restaurant => ({
+                name: restaurant.name,
+                healthRating: restaurant.healthRating,
+                price: getSpecificRestaurantPrice(item.price, restaurant.name)
+            }));
+            switch (sortKey) {
+                case 'price-asc':
+                    restaurantData.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    restaurantData.sort((a, b) => b.price - a.price);
+                    break;
+                case 'recommended':
+                default:
+                    restaurantData.sort((a, b) => b.healthRating - a.healthRating);
+                    break;
+            }
+            const restaurantButtonsHtml = restaurantData.map(data => {
+                const safeName = data.name.replace(/'/g, "\\'");
+                return `<button class="restaurant-select-btn" onclick="confirmAddToCart(${itemId}, '${safeName}')">
+                                <div>
+                                    <strong>${data.name}</strong>
+                                    <div class="restaurant-health-rating">⭐ ${data.healthRating} Health Rating</div>
+                                </div>
+                                <div>₹${data.price}</div>
+                            </button>`;
+            }).join('');
+            document.getElementById('restaurantListContainer').innerHTML = restaurantButtonsHtml;
+        }
+
+
+        function confirmAddToCart(itemId, restaurantName) {
+            const foodItem = findFoodById(itemId);
+            if (!foodItem) return;
+            const specificPrice = getSpecificRestaurantPrice(foodItem.price, restaurantName);
+            if (!shoppingCart[restaurantName]) {
+                shoppingCart[restaurantName] = [];
+            }
+            const existingItem = shoppingCart[restaurantName].find(item => item.id === itemId);
+            if (existingItem) {
+                existingItem.qty++;
+            } else {
+                shoppingCart[restaurantName].push({
+                    id: foodItem.id,
+                    title: foodItem.title,
+                    price: specificPrice,
+                    emoji: foodItem.emoji,
+                    qty: 1
+                });
+            }
+            updateAllCartUI();
+            showNotification(`${foodItem.title} (₹${specificPrice}) added from ${restaurantName}!`, 'success');
+            closeRecipeModal();
+        }
+
+
+        function renderCartView() {
+            if (Object.keys(shoppingCart).length === 0) {
+                cartContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛒</div><p>Your cart is empty. Add some healthy meals!</p></div>';
+                return;
+            }
+            let grandTotal = 0;
+            let allCartsHtml = '';
+            for (const [restaurantName, itemsArray] of Object.entries(shoppingCart)) {
+                let restaurantSubtotal = 0;
+                const itemsHtml = itemsArray.map(item => {
+                    const itemTotal = item.price * item.qty;
+                    restaurantSubtotal += itemTotal;
+                    const safeName = restaurantName.replace(/'/g, "\\'");
+                    return `
+                        <div class="cart-item">
+                            <div class="cart-item-emoji">${item.emoji}</div>
+                            <div class="cart-item-info">
+                                <h4>${item.title}</h4>
+                                <div class="cart-item-price">₹${item.price} x ${item.qty} = <strong>₹${itemTotal}</strong></div>
+                            </div>
+                            <div class="cart-item-qty">
+                                <button class="cart-qty-btn" onclick="updateCartQuantity('${safeName}', ${item.id}, -1)">-</button>
+                                <span style="font-weight: bold; width: 20px; text-align: center;">${item.qty}</span>
+                                <button class="cart-qty-btn" onclick="updateCartQuantity('${safeName}', ${item.id}, 1)">+</button>
+                            </div>
+                            <button class="cart-item-remove" onclick="removeFromCart('${safeName}', ${item.id})">✕</button>
+                        </div>
+                    `;
+                }).join('');
+                allCartsHtml += `
+                    <div class="cart-restaurant-group">
+                        <div class="cart-restaurant-header">${restaurantName}</div>
+                        ${itemsHtml}
+                    </div>
+                `;
+                grandTotal += restaurantSubtotal;
+            }
+            const summaryHtml = `
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <span class="cart-total-label">Grand Total:</span>
+                        <span class="cart-total-value">₹${grandTotal}</span>
+                    </div>
+                    <button class="checkout-btn" onclick="handleCheckout()">Proceed to Checkout (All Orders)</button>
+                </div>
+            `;
+            cartContainer.innerHTML = allCartsHtml + summaryHtml;
+        }
+
+        function updateCartQuantity(restaurantName, itemId, change) {
+            const restaurantCart = shoppingCart[restaurantName];
+            if (!restaurantCart) return;
+            const item = restaurantCart.find(i => i.id === itemId);
+            if (!item) return;
+            item.qty += change;
+            if (item.qty <= 0) {
+                removeFromCart(restaurantName, itemId);
+            } else {
+                renderCartView();
+                updateAllCartUI();
+            }
+        }
+
+        function removeFromCart(restaurantName, itemId) {
+            const restaurantCart = shoppingCart[restaurantName];
+            if (!restaurantCart) return;
+            shoppingCart[restaurantName] = restaurantCart.filter(i => i.id !== itemId);
+            if (shoppingCart[restaurantName].length === 0) {
+                delete shoppingCart[restaurantName];
+            }
+            const foodItem = findFoodById(itemId);
+            showNotification(`${foodItem.title} removed from ${restaurantName} cart.`, 'error');
+            renderCartView();
+            updateAllCartUI();
+        }
+
+        function handleCheckout() {
+            if (Object.keys(shoppingCart).length === 0) {
+                showNotification('Your cart is empty!', 'error');
+                return;
+            }
+            showNotification('Processing all healthy orders!', 'success');
+            shoppingCart = {};
+            renderCartView();
+            updateAllCartUI();
+        }
+
+        // --- OTHER FUNCTIONS (Profile, Logout, etc) ---
+
+        function reorder(orderId) {
+            showNotification(`Reordering items from order #${orderId}...`, 'success');
+        }
+        function addToFavorites(itemId) {
+            showNotification('Added to your healthy favorites!', 'success');
+        }
+
+        function openProfileModal() {
+            modalTitle.textContent = 'Health Profile';
+            const conditionLabels = { 'diabetes': 'Diabetes Type 2', 'hypertension': 'Hypertension', 'high-cholesterol': 'High Cholesterol', 'kidney-disease': 'Kidney Disease' };
+            modalBody.innerHTML = `<div style="text-align:center;margin-bottom:2rem"><div class="profile-avatar" style="width:80px;height:80px;font-size:2rem;margin:0 auto 1rem">JD</div><h3>John Doe</h3><p style="color:#7f8c8d">john.doe@email.com</p></div><div style="margin-bottom:2rem"><h4 style="margin-bottom:1rem;color:#2c3e50">Health Conditions</h4><div class="food-tags">${userHealthProfile.conditions.map(c => `<span class="health-condition">${conditionLabels[c] || c}</span>`).join('')}</div></div><div style="margin-bottom:2rem"><h4 style="margin-bottom:1rem;color:#2c3e50">Dietary Preferences</h4><div class="food-tags"><span class="food-tag">Vegetarian</span><span class="food-tag">Low Sodium</span><span class="food-tag">Sugar Conscious</span></div></div><div style="margin-bottom:2rem"><h4 style="margin-bottom:1rem;color:#2c3e50">Health Goals</h4><div class="food-tags">${userHealthProfile.goals.map(g => `<span class="health-benefit-tag">${g.charAt(0).toUpperCase() + g.slice(1).replace('-', ' ')}</span>`).join('')}</div></div><div style="margin-bottom:2rem"><h4 style="margin-bottom:1rem;color:#2c3e50">Health Stats</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem"><div style="text-align:center;padding:1rem;background:#f8f9fa;border-radius:8px"><div style="font-size:1.5rem;font-weight:bold;color:#27ae60">28</div><div style="color:#7f8c8d;font-size:.9rem">Healthy Meals</div></div><div style="text-align:center;padding:1rem;background:#f8f9fa;border-radius:8px"><div style="font-size:1.5rem;font-weight:bold;color:#3498db">4.8</div><div style="color:#7f8c8d;font-size:.9rem">Health Score</div></div></div></div>
+            <button id="updateProfileBtn" onclick="editHealthProfile()" class="save-btn" style="width: 100%;">
+                Update Health Profile
+            </button>`; // Restored button text and onclick
+            recipeModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => { modalBody.scrollTop = 0; }, 0);
+        }
+
+        // Restored original editHealthProfile function
+        window.editHealthProfile = function () {
+            const updateBtn = document.getElementById('updateProfileBtn');
+            if (!updateBtn) return;
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = `<span class="button-spinner"></span> Updating...`;
+            showNotification('Redirecting to health profile update...', 'info');
+            setTimeout(() => {
+                window.location.replace('onBoarding.html');
+            }, 1500);
+        }
+
+        function handleLogout() { if (confirm('Are you sure you want to logout?')) { showNotification('Logging out...', 'info'); setTimeout(() => { window.location.href = 'login.html'; }, 1500); } }
+
+        function showNotification(message, type = 'info') {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            const n = document.createElement('div'); n.className = `notification ${type}`; n.textContent = message; document.body.appendChild(n);
+            setTimeout(() => { n.style.animation = 'slideOutRight 0.3s ease-in forwards'; setTimeout(() => { if (document.body.contains(n)) document.body.removeChild(n); }, 300); }, 4000);
+        }
+
+        // --- SETTINGS PAGE FUNCTIONS (Restored) ---
+        const allPossibleConditions = { 'diabetes': 'Diabetes Type 2', 'hypertension': 'Hypertension', 'high-cholesterol': 'High Cholesterol', 'kidney-disease': 'Kidney Disease' };
+        const allPossibleGoals = { 'weight-loss': 'Weight Loss', 'better-health': 'Better Health', 'muscle-gain': 'Muscle Gain', 'lower-bp': 'Lower Blood Pressure' };
+
+        function showSettingsTab(tabName, clickedElement) {
+            document.querySelectorAll('.settings-tab-pane').forEach(pane => pane.style.display = 'none');
+            document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById(`settings-tab-${tabName}`).style.display = 'block';
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        function loadHealthSettings() {
+            const conditionsList = document.getElementById('healthConditionsList');
+            conditionsList.innerHTML = Object.entries(allPossibleConditions).map(([key, label]) => {
+                const isChecked = userHealthProfile.conditions.includes(key) ? 'checked' : '';
+                return `
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="health-condition" value="${key}" ${isChecked}>
+                        <span>${label}</span>
+                    </label>`;
+            }).join('');
+            const goalsList = document.getElementById('healthGoalsList');
+            goalsList.innerHTML = Object.entries(allPossibleGoals).map(([key, label]) => {
+                const isChecked = userHealthProfile.goals.includes(key) ? 'checked' : '';
+                return `
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="health-goal" value="${key}" ${isChecked}>
+                        <span>${label}</span>
+                    </label>`;
+            }).join('');
+        }
+
+        function saveHealthSettings() {
+            const selectedConditions = [];
+            document.querySelectorAll('input[name="health-condition"]:checked').forEach(cb => {
+                selectedConditions.push(cb.value);
+            });
+            userHealthProfile.conditions = selectedConditions; // UPDATE GLOBAL OBJECT
+            const selectedGoals = [];
+            document.querySelectorAll('input[name="health-goal"]:checked').forEach(cb => {
+                selectedGoals.push(cb.value);
+            });
+            userHealthProfile.goals = selectedGoals; // UPDATE GLOBAL OBJECT
+            showNotification('Health Profile Updated!', 'success');
+            displayHealthConditions();
+            displayFoodCards();
+        }
+
+        function loadNotificationSettings() {
+            document.getElementById('toggle-health-tips').checked = userSettings.notifications.healthTips;
+            document.getElementById('toggle-order-email').checked = userSettings.notifications.orderEmail;
+            document.getElementById('toggle-health-alerts').checked = userSettings.notifications.healthAlerts;
+        }
+
+        function saveNotificationSettings() {
+            userSettings.notifications.healthTips = document.getElementById('toggle-health-tips').checked;
+            userSettings.notifications.orderEmail = document.getElementById('toggle-order-email').checked;
+            userSettings.notifications.healthAlerts = document.getElementById('toggle-health-alerts').checked;
+            showNotification('Notification settings saved!', 'success');
+        }
+
+        function loadPreferencesSettings() {
+            document.getElementById('defaultSortSelect').value = userSettings.preferences.defaultSort;
+        }
+
+        function savePreferencesSettings() {
+            userSettings.preferences.defaultSort = document.getElementById('defaultSortSelect').value;
+            currentSort = userSettings.preferences.defaultSort;
+            document.getElementById('sortFilter').value = currentSort;
+            showNotification('Preferences saved!', 'success');
+            displayFoodCards();
+        }
+
+        function saveAccountSettings() {
+            const name = document.getElementById('acc-name').value;
+            showNotification(`Account details for ${name} saved (demo)!`, 'success');
+        }
+
+        // --- Make new functions globally accessible for onclick ---
+        window.showSettingsTab = showSettingsTab;
+        window.saveHealthSettings = saveHealthSettings;
+        window.saveNotificationSettings = saveNotificationSettings;
+        window.savePreferencesSettings = savePreferencesSettings;
+        window.saveAccountSettings = saveAccountSettings;
+        window.reorder = reorder;
+        window.addToFavorites = addToFavorites;
+        window.addToCart = addToCart;
+        window.openRestaurantSelector = openRestaurantSelector;
+        window.confirmAddToCart = confirmAddToCart;
+        window.updateCartQuantity = updateCartQuantity;
+        window.removeFromCart = removeFromCart;
+        window.handleCheckout = handleCheckout;
+        window.sortRestaurantList = sortRestaurantList;
+
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', initDashboard);
+        document.addEventListener('click', e => { if (e.target.closest('.food-card')) { const c = e.target.closest('.food-card'); c.style.transform = 'scale(0.98)'; setTimeout(() => { c.style.transform = ''; }, 150); } });
+
+        // Health tips interval (Restored with check)
+        const healthTips = ['Remember to check your blood sugar levels regularly!', 'Stay hydrated - aim for 8 glasses of water daily.', 'Consider a 10-minute walk after meals to help with digestion.', 'Your medication schedule is important for managing your conditions.', 'Fresh vegetables and lean proteins are your best friends!'];
+        setInterval(() => {
+            if (userSettings.notifications.healthTips && Math.random() < 0.15) {
+                showNotification(`Health Tip: ${healthTips[Math.floor(Math.random() * healthTips.length)]}`, 'info');
+            }
+        }, 45000);
+
+        window.onload = function () {
+            window.scrollTo(0, 0);
+        };
+        window.addEventListener('beforeunload', function () {
+            window.scrollTo(0, 0);
+        });
+
+        // Example for a future dashboard.js file
+        function getLoggedInUserId() {
+            // Check localStorage first, then fall back to sessionStorage
+            const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+            return userId;
+        }
+
+        const currentUserId = getLoggedInUserId();
+        if (!currentUserId) {
+            // If no ID is found in either storage, redirect to login
+            window.location.href = 'login.html';
+        }
+
+    </script>
+</body>
+
+</html>

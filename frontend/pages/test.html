@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Food Dashboard - Health Recommendations</title>
+    <link rel="stylesheet" href="/frontend/css/health-recommendations.css">
+</head>
+
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <a href="" class="logo-link">
+                <div class="logo">
+                    <span class="logo-icon">🍽️</span>
+                    <span>Smart Food</span>
+                </div>
+            </a>
+            <div class="user-profile">
+                <span class="welcome-text">Welcome back, John!</span>
+
+                <div class="theme-toggle" id="themeToggle" title="Toggle theme">
+                    <span class="theme-icon moon">🌙</span>
+                    <span class="theme-icon sun">☀️</span>
+                </div>
+
+                <!-- Cart widget removed -->
+
+                <div class="profile-widget-container">
+                    <div class="profile-avatar" id="profileAvatar">JD</div>
+                    <div class="profile-popover" id="profilePopover">
+                        <div class="popover-profile-header">
+                            <div class="popover-avatar">JD</div>
+                            <div class="popover-user-info">
+                                <strong>John Doe</strong>
+                                <span>john.doe@email.com</span>
+                            </div>
+                        </div>
+                        <div class="popover-links">
+                            <a id="popoverProfileBtn" class="popover-link">👤 View Profile</a>
+                            <a id="popoverLogoutBtn" class="popover-link logout">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Health Status</h3>
+                <div class="health-status">
+                    <div class="health-status-title">Active Conditions</div>
+                    <div id="healthConditions">
+                        <span class="health-condition">Diabetes Type 2</span>
+                        <span class="health-condition">Hypertension</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Navigation</h3>
+                <div class="sidebar-item active" data-section="dashboard">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </div>
+                <div class="sidebar-item" data-section="health-recommendations">
+                    <span>🏥</span>
+                    <span>Health Recommendations</span>
+                </div>
+                <div class="sidebar-item" data-section="recommendations">
+                    <span>🎯</span>
+                    <span>All Recommendations</span>
+                </div>
+                <!-- My Cart removed -->
+                <div class="sidebar-item" data-section="favorites">
+                    <span>❤️</span>
+                    <span>Favorites</span>
+                </div>
+                <!-- Order History, Profile, and Settings removed -->
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Filters & Sorting</h3>
+                <div class="filter-group">
+                    <label class="filter-label" for="healthFilter">Health Focus</label>
+                    <select id="healthFilter" class="filter-select">
+                        <option value="">All Foods</option>
+                        <option value="diabetes-friendly">Diabetes Friendly</option>
+                        <option value="heart-healthy">Heart Healthy</option>
+                        <option value="low-sodium">Low Sodium</option>
+                        <option value="high-fiber">High Fiber</option>
+                        <option value="low-sugar">Low Sugar</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="cuisineFilter">Cuisine</label>
+                    <select id="cuisineFilter" class="filter-select">
+                        <option value="">All Cuisines</option>
+                        <option value="indian">Indian</option>
+                        <option value="mediterranean">Mediterranean</option>
+                        <option value="chinese">Chinese</option>
+                        <option value="continental">Continental</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="sortFilter">Sort By</label>
+                    <select id="sortFilter" class="filter-select">
+                        <option value="default">Default (Recommended)</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="rating-desc">Rating: High to Low</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="mainDashboardView">
+                <div class="health-alert">
+                    <div class="health-alert-icon">🏥</div>
+                    <div class="health-alert-content">
+                        <h4>Health-Based Recommendations Active</h4>
+                        <p>Food suggestions are tailored to your diabetes and hypertension management needs.</p>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search for food, restaurants, or cuisines..."
+                        id="searchInput">
+                    <button class="search-btn" id="searchBtn">🔍</button>
+                </div>
+
+                <section class="section" id="healthSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Health-Based Recommendations</h2>
+                        <span class="health-recommendation-badge">Personalized for Your Health</span>
+                    </div>
+                    <div class="food-grid" id="healthRecommendationsGrid">
+                    </div>
+                </section>
+
+                <section class="section" id="safeSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Safe Options for You</h2>
+                        <button class="view-all-btn">View All</button>
+                    </div>
+                    <div class="food-grid" id="safeOptionsGrid">
+                    </div>
+                </section>
+
+                <section class="section" id="moderateSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Moderate Consumption</h2>
+                        <button class="view-all-btn">View All</button>
+                    </div>
+                    <div class="food-grid" id="moderateGrid">
+                    </div>
+                </section>
+            </div>
+            <section class="section" id="cartSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Your Shopping Cart</h2>
+                </div>
+                <div class="cart-container" id="cartContainer">
+                </div>
+            </section>
+
+            <section class="section" id="favoritesSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Your Favorites</h2>
+                </div>
+                <div class="food-grid" id="favoritesGrid">
+                </div>
+            </section>
+
+            <section class="section" id="historySection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Your Order History</h2>
+                </div>
+                <div class="order-history-list" id="historyList">
+                </div>
+            </section>
+
+            <section class="section" id="settingsSection" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Settings</h2>
+                </div>
+
+                <div class="settings-layout">
+                    <nav class="settings-nav">
+                        <div class="settings-nav-item active" onclick="showSettingsTab('account', this)">
+                            <span>👤</span><span>Account</span>
+                        </div>
+                        <div class="settings-nav-item" onclick="showSettingsTab('health', this)">
+                            <span>🏥</span><span>Health Profile</span>
+                        </div>
+                        <div class="settings-nav-item" onclick="showSettingsTab('notifications', this)">
+                            <span>🔔</span><span>Notifications</span>
+                        </div>
+                        <div class="settings-nav-item" onclick="showSettingsTab('preferences', this)">
+                            <span>🎨</span><span>Preferences</span>
+                        </div>
+                    </nav>
+
+                    <div class="settings-content">
+                        <div id="settings-tab-account" class="settings-tab-pane" style="display: block;">
+                            <h3 class="setting-section-title">Account Details</h3>
+                            <div class="form-group">
+                                <label for="acc-name">Full Name</label>
+                                <input type="text" id="acc-name" value="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label for="acc-email">Email Address</label>
+                                <input type="email" id="acc-email" value="john.doe@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="acc-pass">New Password</label>
+                                <input type="password" id="acc-pass" placeholder="Enter new password">
+                            </div>
+                            <button class="save-btn" onclick="saveAccountSettings()">Save Changes</button>
+                        </div>
+
+                        <div id="settings-tab-health" class="settings-tab-pane">
+                            <h3 class="setting-section-title">Manage Health Profile</h3>
+                            <div class="form-group">
+                                <label>Active Health Conditions</label>
+                                <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1rem;">Changes here will
+                                    immediately update your food recommendations.</p>
+                                <div class="checkbox-group" id="healthConditionsList">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Main Health Goals</label>
+                                <div class="checkbox-group" id="healthGoalsList">
+                                </div>
+                            </div>
+                            <button class="save-btn" onclick="saveHealthSettings()">Save Health Profile</button>
+                        </div>
+
+                        <div id="settings-tab-notifications" class="settings-tab-pane">
+                            <h3 class="setting-section-title">Notification Settings</h3>
+                            <div class="toggle-switch">
+                                <span>Enable Health Tips</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-health-tips">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-switch">
+                                <span>Email me Order Updates</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-order-email" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-switch">
+                                <span>Notify of Health Conflicts</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-health-alerts" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <button class="save-btn" style="margin-top: 1.5rem;"
+                                onclick="saveNotificationSettings()">Save Notifications</button>
+                        </div>
+
+                        <div id="settings-tab-preferences" class="settings-tab-pane">
+                            <h3 class="setting-section-title">App Preferences</h3>
+                            <div class="form-group">
+                                <label for="defaultSortSelect">Default Dashboard Sort</label>
+                                <select id="defaultSortSelect" class="filter-select">
+                                    <option value="default">Default (Recommended)</option>
+                                    <option value="price-asc">Price: Low to High</option>
+                                    <option value="price-desc">Price: High to Low</option>
+                                    <option value="rating-desc">Rating: High to Low</option>
+                                </select>
+                            </div>
+                            <button class="save-btn" onclick="savePreferencesSettings()">Save Preferences</button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div> <!-- Floating Action Button -->
+    <button class="fab" id="fabBtn" title="AI Health Assistant">💬</button>
+
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">✕</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Recipe Details</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/frontend/js/test.js"></script>
+</body>
+
+</html>

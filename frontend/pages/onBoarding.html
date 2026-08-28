@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Food - Complete Your Profile</title>
+    <link rel="stylesheet" href="../css/onBoarding.css">
+</head>
+
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="onboarding-container">
+        <div class="header">
+            <div class="logo">🏥</div>
+            <h1 class="title">Complete Your Health Profile</h1>
+            <p class="subtitle">
+                Help us provide personalized food recommendations based on your health needs
+            </p>
+        </div>
+
+        <div class="progress-indicator">
+            <div class="progress-step">
+                <div class="step-circle active" id="step1Circle">1</div>
+                <span class="step-label">Personal Info</span>
+            </div>
+            <div class="step-connector" id="connector1"></div>
+            <div class="progress-step">
+                <div class="step-circle" id="step2Circle">2</div>
+                <span class="step-label">Health Profile</span>
+            </div>
+            <div class="step-connector" id="connector2"></div>
+            <div class="progress-step">
+                <div class="step-circle" id="step3Circle">3</div>
+                <span class="step-label">Preferences</span>
+            </div>
+        </div>
+
+        <form id="healthProfileForm">
+            <div class="form-section active" id="section1">
+                <h2 class="section-title">Personal Information</h2>
+                <p class="section-description">
+                    Let's start with some basic information about yourself to personalize your experience.
+                </p>
+
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="form-group">
+                        <label class="form-label required" for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" class="form-input" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" class="form-input" required>
+                        <div class="error-message"></div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label required" for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" required disabled>
+                    <div class="error-message"></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required" for="age">Age</label>
+                        <input type="number" id="age" name="Age" class="form-input" min="12" max="105" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="gender">Gender</label>
+                        <select id="gender" name="gender" class="form-select" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="height">Height (cm)</label>
+                        <input type="number" id="height" name="Height" class="form-input" min="100" max="240" required>
+                        <div class="error-message"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required" for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" name="Weight" class="form-input" min="30" max="300" step="0.1"
+                            required>
+                        <div class="error-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" id="section2">
+                <h2 class="section-title">Health Profile</h2>
+                <p class="section-description">
+                    Please share your health conditions so we can recommend foods that support your wellbeing.
+                    <strong>This information is confidential and used only for food recommendations.</strong>
+                </p>
+
+                <div class="health-info-grid">
+                    <div class="health-info-card">
+                        <div class="health-info-icon">🔒</div>
+                        <div class="health-info-title">Privacy Protected</div>
+                        <div class="health-info-desc">Your health data is encrypted and never shared</div>
+                    </div>
+                    <div class="health-info-card">
+                        <div class="health-info-icon">🎯</div>
+                        <div class="health-info-title">Personalized Recommendations</div>
+                        <div class="health-info-desc">Get food suggestions tailored to your health needs</div>
+                    </div>
+                    <div class="health-info-card">
+                        <div class="health-info-icon">👨‍⚕️</div>
+                        <div class="health-info-title">Medically Informed</div>
+                        <div class="health-info-desc">Recommendations based on nutritional science</div>
+                    </div>
+                </div>
+
+                <label class="form-label required">Do you have any of the following health conditions?</label>
+                <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1rem;">
+                    Select all that apply.
+                </p>
+
+                <div class="checkbox-group">
+                    <div class="checkbox-item health-condition-item diabetes" data-condition="diabetes">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Diabetes</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item heart-disease" data-condition="heart-disease">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Heart disease</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item kidney-disease" data-condition="kidney-disease">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Kidney disease</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item obesity" data-condition="obesity">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Obesity</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item hypertension" data-condition="hypertension">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Hypertension</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item cholesterol" data-condition="cholesterol">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Cholesterol</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item liver-disease" data-condition="liver-disease">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Liver disease</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item anemia" data-condition="anemia">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Anemia</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item asthma" data-condition="asthma">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Asthma</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item thyroid" data-condition="thyroid">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Thyroid</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item gallstones" data-condition="gallstones">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">Gallstones</div>
+                    </div>
+                    <div class="checkbox-item health-condition-item" data-condition="none">
+                        <div class="custom-checkbox"></div>
+                        <div class="checkbox-label">None of the above</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" id="section3">
+                <h2 class="section-title">Dietary Preferences</h2>
+                <p class="section-description">
+                    Tell us about your food preferences to ensure our recommendations match your lifestyle and taste.
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label required">Health & Fitness Goals</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" data-goal="weight-loss">
+                            <div class="custom-checkbox"></div>
+                            <div class="checkbox-label">Weight Loss</div>
+                        </div>
+                        <div class="checkbox-item" data-goal="weight-gain">
+                            <div class="custom-checkbox"></div>
+                            <div class="checkbox-label">Weight Gain</div>
+                        </div>
+                        <div class="checkbox-item" data-goal="muscle-building">
+                            <div class="custom-checkbox"></div>
+                            <div class="checkbox-label">Muscle Building</div>
+                        </div>
+                        <div class="checkbox-item" data-goal="maintain-health">
+                            <div class="custom-checkbox"></div>
+                            <div class="checkbox-label">Maintain Current Health</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-navigation">
+                <button type="button" class="nav-btn btn-prev" id="prevBtn" style="display: none;">
+                    ← Previous
+                </button>
+                <div class="nav-progress">
+                    <span id="stepIndicator">Step 1 of 3</span>
+                </div>
+                <button type="button" class="nav-btn btn-next" id="nextBtn">
+                    Next →
+                </button>
+                <button type="submit" class="nav-btn btn-complete" id="completeBtn" style="display: none;">
+                    <span id="completeText">Complete Profile</span>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../js/onBoarding.js"></script>
+</body>
+
+</html>
